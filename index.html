@@ -66,19 +66,25 @@
             padding: 25px;
             margin-bottom: 30px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .controls-section h2 {
+            margin-bottom: 20px;
         }
 
         .controls-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 20px;
-            margin-bottom: 20px;
-            max-width: 500px;
+            margin: 0 auto 20px;
+            max-width: 600px;
         }
 
         @media (max-width: 768px) {
             .controls-grid {
                 grid-template-columns: 1fr;
+                max-width: 100%;
             }
         }
 
@@ -114,6 +120,7 @@
         .button-group {
             display: flex;
             gap: 10px;
+            justify-content: center;
         }
 
         .btn {
@@ -173,6 +180,51 @@
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        .stat-card.hidden {
+            display: none;
+        }
+
+        .quick-access {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .quick-access h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #666;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .quick-access-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quick-btn {
+            padding: 8px 14px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .quick-btn:hover {
+            background-color: #fce4ec;
+            border-color: #c41e3a;
+            color: #c41e3a;
         }
 
         .table-container {
@@ -236,6 +288,11 @@
             background-color: #a01830;
             text-decoration: none;
             box-shadow: 0 2px 8px rgba(196, 30, 58, 0.3);
+        }
+
+        .action-link[style*="background-color: #388e3c"]:hover {
+            background-color: #2e7d34 !important;
+            box-shadow: 0 2px 8px rgba(56, 142, 60, 0.3);
         }
 
         .action-link.copied {
@@ -529,9 +586,14 @@
                 <div class="label">Total Checklists</div>
                 <div class="value" id="totalCount">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card hidden">
                 <div class="label">Categories</div>
                 <div class="value" id="categoryCount">4</div>
+            </div>
+            <div class="quick-access">
+                <h3>Quick Access</h3>
+                <div class="quick-access-buttons" id="quickAccessContainer">
+                </div>
             </div>
             <div class="stat-card">
                 <div class="label">Displayed</div>
@@ -676,9 +738,28 @@
         const itemsPerPage = 10;
 
         // Initialize
+        function initializeQuickAccess() {
+            // Extract popular position keywords from checklists
+            const keywords = ['RN', 'ICU', 'LPN', 'Therapist', 'Tech', 'Nurse', 'Manager', 'CNA', 'Coordinator', 'Clinical'];
+            const container = document.getElementById('quickAccessContainer');
+
+            if (container) {
+                container.innerHTML = keywords.map(keyword => `
+                    <button class="quick-btn" onclick="searchQuickAccess('${keyword}')">${keyword}</button>
+                `).join('');
+            }
+        }
+
+        function searchQuickAccess(keyword) {
+            document.getElementById('searchInput').value = keyword;
+            applyFilters();
+            document.getElementById('searchInput').focus();
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             updateStats();
             displayTable();
+            initializeQuickAccess();
 
             // Add Enter key support to search input
             document.getElementById('searchInput').addEventListener('keypress', function(event) {
@@ -789,6 +870,31 @@
             }
         });
 
+        function sendChecklistEmail(link, checklistName) {
+            const subject = encodeURIComponent('Complete Your Checklist - ' + checklistName);
+
+            const emailBody = `Hello Candidate
+
+Please complete the following checklist at your earliest convenience. This is an important step in the submission process.
+
+Checklist: ${checklistName}
+
+Form Link: ${link}
+
+Instructions:
+- Click the link above or copy and paste it into your browser
+- The form can be completed on desktop, tablet, or mobile device
+- Please complete all required fields
+- Submit the form once you have completed all items
+
+Please complete this checklist as soon as possible.`;
+
+            const encodedBody = encodeURIComponent(emailBody);
+            const mailtoLink = 'mailto:?subject=' + subject + '&body=' + encodedBody;
+
+            window.location.href = mailtoLink;
+        }
+
         function applyFilters() {
             const search = document.getElementById('searchInput').value.trim().toLowerCase();
 
@@ -836,13 +942,16 @@
                 <tr>
                     <td class="checklist-name">${item.name}</td>
                     <td>#${item.no}</td>
-                    <td>
+                    <td style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                         <div class="tooltip">
                             <button class="action-link copy-btn" data-link="${item.link}">
                                 Copy Link
                             </button>
                             <span class="tooltiptext">Link copied to clipboard!</span>
                         </div>
+                        <button class="action-link send-btn" data-link="${item.link}" data-name="${item.name}" style="background-color: #388e3c;">
+                            Send Checklist
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -853,6 +962,16 @@
                     e.preventDefault();
                     const link = this.getAttribute('data-link');
                     copyToClipboard(link, this);
+                });
+            });
+
+            // Add click handlers to send buttons
+            document.querySelectorAll('.send-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const link = this.getAttribute('data-link');
+                    const name = this.getAttribute('data-name');
+                    sendChecklistEmail(link, name);
                 });
             });
 
