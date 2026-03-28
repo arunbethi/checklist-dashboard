@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Staffing Checklists - Zenex Partners</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header-container {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header-left h1 .highlight {
+            color: #c41e3a;
+        }
+
+        .header-left p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .header-badge {
+            background-color: #fce4ec;
+            color: #c41e3a;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .controls-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+            max-width: 500px;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .control-group input,
+        .control-group select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #c41e3a;
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #c41e3a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #a01830;
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e8e8e8;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #c41e3a;
+            margin: 10px 0;
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f8f8;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #666;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .checklist-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .action-link {
+            display: inline-block;
+            background-color: #c41e3a;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 100px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-link:hover {
+            background-color: #a01830;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.3);
+        }
+
+        .action-link.copied {
+            background-color: #388e3c;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 140px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -70px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext,
+        .tooltip.show .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .no-results p {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background-color: #f0f0f0;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .page-info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 15px 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-left h1 {
+                font-size: 24px;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-left">
+            <h1>Healthcare <span class="highlight">Staffing</span> Checklists</h1>
+            <p>Onboarding compliance tools for all healthcare positions</p>
+        </div>
+        <div class="header-badge">ZENEX PARTNERS - HEALTHCARE STAFFING</div>
+    </div>
+
+    <div class="main-container">
+        <div class="controls-section">
+            <h2 style="margin-bottom: 20px; font-size: 18px;">Search Checklists</h2>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="searchInput">Search by Checklist Name</label>
+                    <input type="text" id="searchInput" placeholder="e.g., RN, ICU, Pharmacist...">
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset All</button>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="label">Total Checklists</div>
+                <div class="value" id="totalCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Categories</div>
+                <div class="value" id="categoryCount">4</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Displayed</div>
+                <div class="value" id="displayedCount">0</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 55%;">Checklist Name</th>
+                        <th style="width: 15%;">Position #</th>
+                        <th style="width: 30%;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display: none;">
+                <p>No checklists found matching your criteria.</p>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <button id="prevBtn" onclick="previousPage()" disabled>← Previous</button>
+            <span class="page-info">
+                Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+            </span>
+            <button id="nextBtn" onclick="nextPage()">Next →</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Healthcare Staffing Checklists Dashboard | Last Updated: March 2026 | Zenex Partners</p>
+    </div>
+
+    <script>
+        // Data from CSV
+        const checklistData = [
+            {category: "Registered Nurse & CNA", no: 1, name: "Chief Nursing Officer (CNO)", link: "https://forms.office.com/r/kANK1c7NK6"},
+            {category: "Registered Nurse & CNA", no: 2, name: "RN (Infection Prevention)", link: "https://forms.office.com/r/ZnWUZDsFUJ"},
+            {category: "Registered Nurse & CNA", no: 3, name: "RN (Clinical Coordinator)", link: "https://forms.office.com/r/wFhHfuLUFW"},
+            {category: "Registered Nurse & CNA", no: 4, name: "RN (Operating Room)", link: "https://forms.office.com/r/z1BcJtuye6"},
+            {category: "Registered Nurse & CNA", no: 5, name: "RN/Nursing Manager", link: "https://forms.office.com/r/EYt2SHSyi6"},
+            {category: "Registered Nurse & CNA", no: 6, name: "RN (Vaccination Support)", link: "https://forms.office.com/r/FrXGwfcU"},
+            {category: "Registered Nurse & CNA", no: 7, name: "RN (Ambulatory Care)", link: "https://forms.office.com/r/9VZELa4b4c"},
+            {category: "Registered Nurse & CNA", no: 8, name: "RN Supervisor", link: "https://forms.office.com/r/9kYeT7u61X"},
+            {category: "Registered Nurse & CNA", no: 9, name: "RN (Quality Management)", link: "https://forms.office.com/r/rNz4fnSQYi"},
+            {category: "Registered Nurse & CNA", no: 10, name: "RN (School Nurse)", link: "https://forms.office.com/r/vQjYHB8hLQ"},
+            {category: "Registered Nurse & CNA", no: 11, name: "RN (Clinical Documentation Specialist)", link: "https://forms.office.com/r/NeaqceFZvc"},
+            {category: "Registered Nurse & CNA", no: 12, name: "RN (Behavioral Health)", link: "https://forms.office.com/r/NnigACY9ZZ"},
+            {category: "Registered Nurse & CNA", no: 13, name: "RN (Long Term Care)", link: "https://forms.office.com/r/W7xjDUWLmU"},
+            {category: "Registered Nurse & CNA", no: 14, name: "RN (Wound Care)", link: "https://forms.office.com/r/7a6EJ6XZZn"},
+            {category: "Registered Nurse & CNA", no: 15, name: "RN (PCU)", link: "https://forms.office.com/r/Lq4HRFLTRT"},
+            {category: "Registered Nurse & CNA", no: 16, name: "RN (Sub Acute Care)", link: "https://forms.office.com/r/YJRTPAF5XW"},
+            {category: "Registered Nurse & CNA", no: 17, name: "CNA", link: "https://forms.office.com/r/gc4z1JQGNp"},
+            {category: "Registered Nurse & CNA", no: 18, name: "RN (Case Manager)", link: "https://forms.office.com/r/Gcdn1czbgG"},
+            {category: "Registered Nurse & CNA", no: 19, name: "RN (Emergency Room)", link: "https://forms.office.com/r/B56n8ABpAX"},
+            {category: "Registered Nurse & CNA", no: 20, name: "RN (Infusion)", link: "https://forms.office.com/r/LfgMmBmkEP"},
+            {category: "Registered Nurse & CNA", no: 21, name: "RN (Oncology)", link: "https://forms.office.com/r/spjpqXevr7"},
+            {category: "Registered Nurse & CNA", no: 22, name: "RN (Med/Surg - Telemetry)", link: "https://forms.office.com/r/SmWa9rG3cS"},
+            {category: "Registered Nurse & CNA", no: 23, name: "RN (PACU)", link: "https://forms.office.com/r/m04M5ZpfC4"},
+            {category: "Registered Nurse & CNA", no: 24, name: "RN (Telemetry)", link: "https://forms.office.com/r/nP1NbnaQWw"},
+            {category: "Registered Nurse & CNA", no: 25, name: "RN (Labor & Delivery)", link: "https://forms.office.com/r/aYPMqhV7Pk"},
+            {category: "Registered Nurse & CNA", no: 26, name: "RN (Med Surg)", link: "https://forms.office.com/r/6E64SNmsF8"},
+            {category: "Registered Nurse & CNA", no: 27, name: "RN (ICU)", link: "https://forms.office.com/r/2fQkyp8Kmi"},
+            {category: "Registered Nurse & CNA", no: 28, name: "RN (Hospice)", link: "https://forms.office.com/r/0YNmkdQL8s"},
+            {category: "Registered Nurse & CNA", no: 29, name: "RN (Home Health)", link: "https://forms.office.com/r/R1LVQygf5a"},
+            {category: "Registered Nurse & CNA", no: 30, name: "RN (Endoscopy)", link: "https://forms.office.com/r/3duzG2HwFg"},
+            {category: "Licensed Practical Nurse", no: 1, name: "LPN (Long Term Care)", link: "https://forms.office.com/r/m8AGS416iX"},
+            {category: "Licensed Practical Nurse", no: 2, name: "LPN (Pediatrics)", link: "https://forms.office.com/pages/responsepage.aspx?id=t-QEyjrGOkCv1KqgbNkn8GrBTwDEH1pNsLzFea7DcTdUNFlTOFZFWFlSUklMODhDQ0paTzk0STdBNS4u"},
+            {category: "Licensed Practical Nurse", no: 3, name: "LPN", link: "https://forms.office.com/pages/responsepage.aspx?id=t-QEyjrGOkCv1KqgbNkn8GrBTwDEH1pNsLzFea7DcTdURFlKOFc5MUpLQzZRNVRaVjgxVE5MMzRRQi4u"},
+            {category: "Licensed Practical Nurse", no: 4, name: "LPN (Home Health)", link: "https://forms.office.com/pages/responsepage.aspx?id=t-QEyjrGOkCv1KqgbNkn8GrBTwDEH1pNsLzFea7DcTdUMjIySFRDWUw2TllIUVhCMDMxQ01YWkNKOC4u"},
+            {category: "Therapists", no: 1, name: "Occupational Therapist Checklist", link: "https://forms.office.com/r/tGKqTgxfz9"},
+            {category: "Therapists", no: 2, name: "Physical Therapy Assistant", link: "https://forms.office.com/r/YBABP6b3iK"},
+            {category: "Therapists", no: 3, name: "Speech Language Pathologist", link: "https://forms.office.com/pages/responsepage.aspx?id=t-QEyjrGOkCv1KqgbNkn8GrBTwDEH1pNsLzFea7DcTdURjRHRDNTNTNKSVZTREhNTzEySUJEV0hJNy4u"},
+            {category: "Therapists", no: 4, name: "Respiratory Therapist", link: "https://forms.office.com/pages/responsepage.aspx?id=t-QEyjrGOkCv1KqgbNkn8GrBTwDEH1pNsLzFea7DcTdUOTRCR0JPVThSTjlXVEI1Vjk1RDFEMDFBUi4u"},
+            {category: "Therapists", no: 5, name: "Physical Therapist", link: "https://forms.office.com/pages/responsepage.aspx?id=t-QEyjrGOkCv1KqgbNkn8GrBTwDEH1pNsLzFea7DcTdUREdRWlNBU0dNSlVNUE5ORUU0RkhMNTNKTy4u"},
+            {category: "Therapists", no: 6, name: "Radiation Therapist", link: "https://forms.office.com/r/gAEiE67Ffe"},
+            {category: "Others", no: 1, name: "Medical Scribe", link: "https://forms.office.com/r/KFdT0scTYU"},
+            {category: "Others", no: 2, name: "Certified Behavior Technician", link: "https://forms.office.com/r/dC588Tk1aa"},
+            {category: "Others", no: 3, name: "Lab Aide / Lab Assistant", link: "https://forms.office.com/r/hFDNkbSx3P"},
+            {category: "Others", no: 4, name: "Laboratory Operations Leader", link: "https://forms.office.com/r/rZ8t34hKRP"},
+            {category: "Others", no: 5, name: "Radiology Tech", link: "https://forms.office.com/r/ZMNcWz3PiV"},
+            {category: "Others", no: 6, name: "Cath Lab Tech", link: "https://forms.office.com/r/Vsv7qz0nTa"},
+            {category: "Others", no: 7, name: "Dialysis Tech", link: "https://forms.office.com/r/cCArAaFxeU"},
+            {category: "Others", no: 8, name: "Paramedic", link: "https://forms.office.com/r/msN3g4rhrK"},
+            {category: "Others", no: 9, name: "MRI Tech", link: "https://forms.office.com/r/G6e1JZicis"},
+            {category: "Others", no: 10, name: "Medication Aide", link: "https://forms.office.com/r/d4nr0BSyST"},
+            {category: "Others", no: 11, name: "Patient Accounting Rep", link: "https://forms.office.com/r/LCrd6SFzNN"},
+            {category: "Others", no: 12, name: "Radiology Director of Clinical Operations", link: "https://forms.office.com/r/CsiJiLVXDe"},
+            {category: "Others", no: 13, name: "Claims Specialist", link: "https://forms.office.com/r/CxtE0rs3kh"},
+            {category: "Others", no: 14, name: "Nursing Assistant", link: "https://forms.office.com/r/GkWVF84YJF"},
+            {category: "Others", no: 15, name: "Paraprofessional", link: "https://forms.office.com/pages/responsepage.aspx?id=t-QEyjrGOkCv1KqgbNkn8GrBTwDEH1pNsLzFea7DcTdUQzJSS0dEUFE3VUNFQjVYOFJKUEk2TEpPQi4u&route=shorturl"},
+            {category: "Others", no: 16, name: "Athletic Trainer", link: "https://forms.office.com/r/JFdsTnjXg6"},
+            {category: "Others", no: 17, name: "EEG Technician", link: "https://forms.office.com/r/E5m2xAmBXQ"},
+            {category: "Others", no: 18, name: "Anesthesia Technician", link: "https://forms.office.com/r/QArgY0dzRf"},
+            {category: "Others", no: 19, name: "Histology Technician", link: "https://forms.office.com/r/FJ4BdQibTT"},
+            {category: "Others", no: 20, name: "EKG Technician", link: "https://forms.office.com/r/yYtcBKdPVQ"},
+            {category: "Others", no: 21, name: "Ophthalmic Technician", link: "https://forms.office.com/r/Mcc2kiNs4U"},
+            {category: "Others", no: 22, name: "Pharmacist", link: "https://forms.office.com/r/5StkhvmWih"},
+            {category: "Others", no: 23, name: "Dietician", link: "https://forms.office.com/r/SszU0f5qTc"},
+            {category: "Others", no: 24, name: "Audiologist", link: "https://forms.office.com/r/cLtXFaP7Jk"},
+            {category: "Others", no: 25, name: "Medical Lab Technologist", link: "https://forms.office.com/r/QjaxkwMcLE"},
+            {category: "Others", no: 26, name: "Dental Assistant", link: "https://forms.office.com/r/PTFwT6T2jB"},
+            {category: "Others", no: 27, name: "Clinical Lab Scientist", link: "https://forms.office.com/r/MFa1wvwuAH"},
+            {category: "Others", no: 28, name: "Monitor Tech", link: "https://forms.office.com/r/CrwXXiHGrf"},
+            {category: "Others", no: 29, name: "Home Health Aide", link: "https://forms.office.com/r/byNRV3b672"},
+            {category: "Others", no: 30, name: "Patient Care Technician", link: "https://forms.office.com/r/wnGU28UVJD"},
+            {category: "Others", no: 31, name: "Phlebotomy Checklist", link: "https://forms.office.com/r/RyQQ4ixR09"},
+            {category: "Others", no: 32, name: "Medical Assistant", link: "https://forms.office.com/r/0supmMZ2N6"},
+            {category: "Others", no: 33, name: "Pharmacy Technician", link: "https://forms.office.com/r/wC6VKnad8d"},
+            {category: "Others", no: 34, name: "Sterile Processing Tech", link: "https://forms.office.com/r/xXwXEyXE4K"},
+            {category: "Others", no: 35, name: "OR Tech / Surgical Tech", link: "https://forms.office.com/r/atdiVHZjRz"},
+            {category: "Others", no: 36, name: "Sign Language Interpreter", link: "https://forms.office.com/r/GRnvmMsfRB"},
+            {category: "Others", no: 37, name: "Social Worker", link: "https://forms.office.com/r/zHvqkD5Jv5"},
+            {category: "Others", no: 38, name: "Special Education Teacher", link: "https://forms.office.com/r/VhNXLQPV3m"},
+            {category: "Others", no: 39, name: "X-Ray Tech", link: "https://forms.office.com/r/JrwgawHj9D"},
+            {category: "Others", no: 40, name: "Polysomnographer / Sleep Tech", link: "https://forms.office.com/r/jX94UD7V8y"},
+            {category: "Others", no: 41, name: "Psych / Behavioral Health Tech", link: "https://forms.office.com/r/8urmt49KS4"},
+            {category: "Others", no: 42, name: "Ultrasound/Sonographer Tech", link: "https://forms.office.com/r/9FgBBTCDYd"},
+            {category: "Others", no: 43, name: "CT Technologist", link: "https://forms.office.com/r/mvDEYyQWeH"}
+        ];
+
+        let filteredData = [...checklistData];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            displayTable();
+
+            // Add Enter key support to search input
+            document.getElementById('searchInput').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    applyFilters();
+                }
+            });
+        });
+
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Add visual feedback
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.classList.add('copied');
+
+                // Show tooltip
+                const tooltip = button.closest('.tooltip');
+                tooltip.classList.add('show');
+
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                    tooltip.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy link. Please try again.');
+            });
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.trim().toLowerCase();
+
+            filteredData = checklistData.filter(item => {
+                return search === '' ||
+                    item.name.toLowerCase().includes(search);
+            });
+
+            currentPage = 1;
+            updateStats();
+            displayTable();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            filteredData = [...checklistData];
+            currentPage = 1;
+            updateStats();
+            displayTable();
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').textContent = checklistData.length;
+            document.getElementById('displayedCount').textContent = filteredData.length;
+        }
+
+        function displayTable() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            const tableBody = document.getElementById('tableBody');
+            const noResults = document.getElementById('noResults');
+
+            if (pageData.length === 0) {
+                tableBody.innerHTML = '';
+                noResults.style.display = 'block';
+                updatePagination();
+                return;
+            }
+
+            noResults.style.display = 'none';
+
+            tableBody.innerHTML = pageData.map(item => `
+                <tr>
+                    <td class="checklist-name">${item.name}</td>
+                    <td>#${item.no}</td>
+                    <td>
+                        <div class="tooltip">
+                            <button class="action-link" onclick="copyToClipboard('${item.link}', this)">
+                                Copy Link
+                            </button>
+                            <span class="tooltiptext">Link copied to clipboard!</span>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayTable();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayTable();
+                window.scrollTo(0, 0);
+            }
+        }
+    </script>
+</body>
+</html>
