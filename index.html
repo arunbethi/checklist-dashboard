@@ -283,6 +283,103 @@
             opacity: 1;
         }
 
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-box h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .modal-box p {
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .link-field {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .link-field input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .link-field input:focus {
+            outline: none;
+            border-color: #c41e3a;
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-primary {
+            background-color: #c41e3a;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background-color: #a01830;
+            box-shadow: 0 2px 8px rgba(196, 30, 58, 0.3);
+        }
+
+        .modal-btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: #e8e8e8;
+        }
+
         .no-results {
             text-align: center;
             padding: 40px;
@@ -403,6 +500,7 @@
     <div class="header-container">
         <div class="header-left">
             <h1>Healthcare <span class="highlight">Staffing</span> Checklists</h1>
+            <p>Onboarding compliance tools for all healthcare positions</p>
         </div>
         <div class="header-badge">ZENEX PARTNERS - HEALTHCARE STAFFING</div>
     </div>
@@ -465,6 +563,20 @@
 
     <div class="footer">
         <p>Healthcare Staffing Checklists Dashboard | Last Updated: March 2026 | Zenex Partners</p>
+    </div>
+
+    <div class="modal-overlay" id="linkModal">
+        <div class="modal-box">
+            <h3>Copy Form Link</h3>
+            <p>The link to the form has been copied! You can also copy it manually from below:</p>
+            <div class="link-field">
+                <input type="text" id="linkInput" readonly>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-primary" onclick="copyFromModal()">Copy to Clipboard</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeLinkModal()">Close</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -573,27 +685,72 @@
         });
 
         function copyToClipboard(text, button) {
-            navigator.clipboard.writeText(text).then(() => {
-                // Add visual feedback
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopySuccess(button);
+                }).catch(err => {
+                    // Fallback if clipboard API fails (e.g., in SharePoint)
+                    console.warn('Clipboard API failed, showing modal:', err);
+                    showLinkModal(text);
+                });
+            } else {
+                // If clipboard API not available, show modal
+                showLinkModal(text);
+            }
+        }
+
+        function showCopySuccess(button) {
+            const originalText = button.textContent;
+            button.textContent = '✓ Copied!';
+            button.classList.add('copied');
+
+            // Show tooltip
+            const tooltip = button.closest('.tooltip');
+            tooltip.classList.add('show');
+
+            // Reset after 2 seconds
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('copied');
+                tooltip.classList.remove('show');
+            }, 2000);
+        }
+
+        function showLinkModal(link) {
+            document.getElementById('linkInput').value = link;
+            document.getElementById('linkModal').classList.add('show');
+        }
+
+        function closeLinkModal() {
+            document.getElementById('linkModal').classList.remove('show');
+        }
+
+        function copyFromModal() {
+            const input = document.getElementById('linkInput');
+            input.select();
+
+            try {
+                document.execCommand('copy');
+                const button = event.target;
                 const originalText = button.textContent;
                 button.textContent = '✓ Copied!';
-                button.classList.add('copied');
-
-                // Show tooltip
-                const tooltip = button.closest('.tooltip');
-                tooltip.classList.add('show');
-
-                // Reset after 2 seconds
                 setTimeout(() => {
                     button.textContent = originalText;
-                    button.classList.remove('copied');
-                    tooltip.classList.remove('show');
                 }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-                alert('Failed to copy link. Please try again.');
-            });
+            } catch (err) {
+                console.error('Copy failed:', err);
+                alert('Please manually select and copy the link.');
+            }
         }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('linkModal');
+            if (event.target === modal) {
+                closeLinkModal();
+            }
+        });
 
         function applyFilters() {
             const search = document.getElementById('searchInput').value.trim().toLowerCase();
