@@ -286,12 +286,13 @@
         .modal-overlay {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 99999 !important;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.6);
+            overflow: auto;
         }
 
         .modal-overlay.show {
@@ -307,6 +308,9 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             max-width: 500px;
             width: 90%;
+            margin: auto;
+            position: relative;
+            z-index: 100000 !important;
         }
 
         .modal-box h3 {
@@ -330,7 +334,7 @@
         .link-field input {
             flex: 1;
             padding: 10px 12px;
-            border: 1px solid #ddd;
+            border: 2px solid #ddd;
             border-radius: 4px;
             font-size: 13px;
             font-family: 'Courier New', monospace;
@@ -341,7 +345,7 @@
         .link-field input:focus {
             outline: none;
             border-color: #c41e3a;
-            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+            background-color: white;
         }
 
         .modal-buttons {
@@ -685,17 +689,23 @@
         });
 
         function copyToClipboard(text, button) {
-            // Try modern clipboard API first
+            console.log('Copy clicked, link:', text);
+
+            // Always try the modern API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showCopySuccess(button);
-                }).catch(err => {
-                    // Fallback if clipboard API fails (e.g., in SharePoint)
-                    console.warn('Clipboard API failed, showing modal:', err);
-                    showLinkModal(text);
-                });
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        console.log('Clipboard API success');
+                        showCopySuccess(button);
+                    })
+                    .catch((err) => {
+                        console.warn('Clipboard API failed:', err);
+                        // Fallback to modal
+                        setTimeout(() => showLinkModal(text), 100);
+                    });
             } else {
-                // If clipboard API not available, show modal
+                console.log('Clipboard API not available, showing modal');
+                // If clipboard API not available, show modal immediately
                 showLinkModal(text);
             }
         }
@@ -707,47 +717,74 @@
 
             // Show tooltip
             const tooltip = button.closest('.tooltip');
-            tooltip.classList.add('show');
+            if (tooltip) {
+                tooltip.classList.add('show');
+            }
 
             // Reset after 2 seconds
             setTimeout(() => {
                 button.textContent = originalText;
                 button.classList.remove('copied');
-                tooltip.classList.remove('show');
+                if (tooltip) {
+                    tooltip.classList.remove('show');
+                }
             }, 2000);
         }
 
         function showLinkModal(link) {
-            document.getElementById('linkInput').value = link;
-            document.getElementById('linkModal').classList.add('show');
+            console.log('Opening modal with link:', link);
+            const modal = document.getElementById('linkModal');
+            const input = document.getElementById('linkInput');
+
+            if (input && modal) {
+                input.value = link;
+                modal.classList.add('show');
+                // Auto-select the text
+                setTimeout(() => {
+                    input.select();
+                }, 100);
+            } else {
+                console.error('Modal elements not found');
+                alert('Link: ' + link + '\n\nPlease copy this link manually.');
+            }
         }
 
         function closeLinkModal() {
-            document.getElementById('linkModal').classList.remove('show');
+            const modal = document.getElementById('linkModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
         }
 
         function copyFromModal() {
             const input = document.getElementById('linkInput');
+            if (!input) return;
+
             input.select();
 
             try {
-                document.execCommand('copy');
-                const button = event.target;
-                const originalText = button.textContent;
-                button.textContent = '✓ Copied!';
-                setTimeout(() => {
-                    button.textContent = originalText;
-                }, 2000);
+                const success = document.execCommand('copy');
+                if (success) {
+                    const button = event.target;
+                    const originalText = button.textContent;
+                    button.textContent = '✓ Copied!';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                    }, 2000);
+                } else {
+                    alert('Copy failed. Please try selecting the text manually.');
+                }
             } catch (err) {
                 console.error('Copy failed:', err);
-                alert('Please manually select and copy the link.');
+                alert('Copy failed. Please select the text and try Ctrl+C (or Cmd+C on Mac)');
             }
         }
 
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('linkModal');
-            if (event.target === modal) {
+            const modalBox = document.querySelector('.modal-box');
+            if (modal && event.target === modal && !modalBox.contains(event.target)) {
                 closeLinkModal();
             }
         });
@@ -801,7 +838,7 @@
                     <td>#${item.no}</td>
                     <td>
                         <div class="tooltip">
-                            <button class="action-link" onclick="copyToClipboard('${item.link}', this)">
+                            <button class="action-link copy-btn" data-link="${item.link}">
                                 Copy Link
                             </button>
                             <span class="tooltiptext">Link copied to clipboard!</span>
@@ -809,6 +846,15 @@
                     </td>
                 </tr>
             `).join('');
+
+            // Add click handlers to newly created buttons
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const link = this.getAttribute('data-link');
+                    copyToClipboard(link, this);
+                });
+            });
 
             updatePagination();
         }
